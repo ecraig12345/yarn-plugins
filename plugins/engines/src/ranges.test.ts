@@ -36,6 +36,7 @@ describe('isRangeSatisfied', () => {
   it('returns true if the repo range fully overlaps the manifest range', () => {
     expect(isRangeSatisfied({ repoRange: '>=14.0.0', manifestRange: '>=12.0.0' })).toBe(true);
     expect(isRangeSatisfied({ repoRange: '^14.0.0', manifestRange: '>=14.0.0' })).toBe(true);
+    expect(isRangeSatisfied({ repoRange: '14', manifestRange: '>=14.0.0' })).toBe(true);
     expect(isRangeSatisfied({ repoRange: '^14.2.0', manifestRange: '^14.1.0 || >=16' })).toBe(true);
     expect(isRangeSatisfied({ repoRange: '^14.2.0', manifestRange: '*' })).toBe(true);
   });

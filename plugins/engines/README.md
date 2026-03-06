@@ -29,4 +29,6 @@ engines:
   ignorePackages:
     - pkg1
     - pkg2
+  # Include verbose warnings (such as for missing optional deps)
+  verbose: true
 ```

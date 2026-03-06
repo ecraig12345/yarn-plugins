@@ -37,5 +37,8 @@
       "tar@npm:^6.0.5": "Fix security issue (API is compatible)"
     }
   },
+  "engines": {
+    "node": ">=20"
+  },
   "packageManager": "yarn@4.12.0"
 }

@@ -46,6 +46,7 @@ var plugin = (() => {
   });
   var import_core = __require("@yarnpkg/core");
   var import_fslib = __require("@yarnpkg/fslib");
+  var import_path = __toESM(__require("path"));
   var import_semver2 = __toESM(__require("semver"));
 
   // src/ranges.ts
@@ -80,18 +81,32 @@ var plugin = (() => {
           description: "Whether to include local dev dependencies and private packages when validating engines.node",
           type: import_core.SettingsType.BOOLEAN,
           default: false
+        },
+        verbose: {
+          description: "Enable verbose warnings for debugging",
+          type: import_core.SettingsType.BOOLEAN,
+          default: false
         }
       }
     }
   };
+  var nodeFs = new import_fslib.NodeFS();
   var validateProjectAfterInstall = async (project, report) => {
-    const nodeFs = new import_fslib.NodeFS();
     const enginesConfig = project.configuration.get("engines");
     const ignorePackages = enginesConfig?.get("ignorePackages") || [];
     const includeDevDependencies = !!enginesConfig?.get("includeDevDependencies");
+    const verbose = !!enginesConfig?.get("verbose");
+    const linkerName = project.configuration.get("nodeLinker") || "node-modules";
     const reportError = (message) => {
       report.reportError(0, `[yarn-plugin-engines] ${String(message)}`);
     };
+    const verboseWarning = (message) => {
+      verbose && report.reportWarning(0, `[yarn-plugin-engines] warning: ${String(message)}`);
+    };
+    if (linkerName !== "pnpm" && linkerName !== "node-modules") {
+      reportError(`This plugin is not compatible with the ${linkerName} linker`);
+      return;
+    }
     const rangeStr = project.topLevelWorkspace.manifest.raw.engines?.node;
     if (!rangeStr) {
       reportError("Missing package.json engines.node field");
@@ -109,10 +124,6 @@ var plugin = (() => {
       return;
     }
     const linker = project.configuration.getLinkers().find((linker2) => linker2.supportsPackage(project.workspaces[0].anchoredPackage, { project }));
-    if (!linker) {
-      reportError("No supported linker found");
-      return;
-    }
     const dependenciesQueue = [];
     const processedDependencies = /* @__PURE__ */ new Set();
     const optionalDependencies = /* @__PURE__ */ new Set();
@@ -143,29 +154,33 @@ var plugin = (() => {
     while (dependenciesQueue.length) {
       const descriptorHash = dependenciesQueue.shift();
       processedDependencies.add(descriptorHash);
+      const isOptional = optionalDependencies.has(descriptorHash);
+      const maybeReportError = (message) => !isOptional && reportError(message);
       const desc = project.storedDescriptors.get(descriptorHash);
-      const prettyDesc = desc ? import_core.structUtils.prettyDescriptor(project.configuration, desc) : descriptorHash;
+      if (!desc) {
+        maybeReportError(`Could not find descriptor for hash ${descriptorHash}`);
+        continue;
+      }
+      const prettyDesc = import_core.structUtils.prettyDescriptor(project.configuration, desc);
       const locatorHash = project.storedResolutions.get(descriptorHash);
       if (!locatorHash) {
-        if (!optionalDependencies.has(descriptorHash)) {
-          reportError(`Could not find a resolution for descriptor ${prettyDesc}`);
-        }
+        maybeReportError(`Could not find a resolved version for ${prettyDesc}`);
         continue;
       }
       const pkg = project.storedPackages.get(locatorHash);
       if (!pkg) {
-        if (!optionalDependencies.has(descriptorHash)) {
-          reportError(`Could not find a package for descriptor ${prettyDesc}`);
-        }
+        maybeReportError(`Could not find an installed package for ${prettyDesc}`);
         continue;
       }
-      let location;
-      try {
-        location = await linker.findPackageLocation(pkg, { project, report });
-      } catch (e) {
-        if (!optionalDependencies.has(descriptorHash)) {
-          reportError(e.message || e);
-        }
+      const location = await findPackageLocation(pkg, {
+        project,
+        report,
+        linker,
+        isOptional,
+        verboseWarning
+      });
+      if (!location) {
+        maybeReportError(`Could not find location for ${prettyDesc}`);
         continue;
       }
       const manifest = await import_core.Manifest.tryFind(location, { baseFs: nodeFs });
@@ -189,6 +204,34 @@ var plugin = (() => {
       );
     }
   };
+  async function findPackageLocation(pkg, opts) {
+    const { project, report, linker, isOptional, verboseWarning } = opts;
+    const prettyPkg = import_core.structUtils.prettyLocator(project.configuration, pkg);
+    try {
+      return await linker.findPackageLocation(pkg, { project, report });
+    } catch (e) {
+      if (isOptional) {
+        verboseWarning(`Could not find location for optional package ${prettyPkg}, skipping...`);
+        return void 0;
+      }
+      if (import_core.structUtils.isVirtualLocator(pkg)) {
+        verboseWarning(
+          `Could not find location for ${prettyPkg} - trying devirtualized locator... (original error: ${e})`
+        );
+        try {
+          const loc = import_core.structUtils.devirtualizeLocator(pkg);
+          return await linker.findPackageLocation(loc, { project, report });
+        } catch {
+        }
+      }
+    }
+    const nmPath = import_path.default.join(project.cwd, "node_modules", import_core.structUtils.stringifyIdent(pkg));
+    if (nodeFs.existsSync(nmPath)) {
+      verboseWarning(`Falling back to node_modules path for ${prettyPkg}: ${nmPath}`);
+      return nmPath;
+    }
+    return void 0;
+  }
   var plugin = {
     hooks: { validateProjectAfterInstall },
     configuration: configurationMap
