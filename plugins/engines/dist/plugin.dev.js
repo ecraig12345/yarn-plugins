@@ -47,8 +47,24 @@ var plugin = (() => {
   var import_core = __require("@yarnpkg/core");
   var import_fslib = __require("@yarnpkg/fslib");
   var import_semver = __toESM(__require("semver"));
+  var configurationMap = {
+    engines: {
+      description: "Config for yarn-plugin-engines",
+      type: import_core.SettingsType.SHAPE,
+      properties: {
+        ignorePackages: {
+          description: "List of packages to ignore when validating engines.node (also ignores their dependencies)",
+          type: import_core.SettingsType.STRING,
+          isArray: true,
+          default: []
+        }
+      }
+    }
+  };
   var validateProjectAfterInstall = async (project, report) => {
     const nodeFs = new import_fslib.NodeFS();
+    const enginesConfig = project.configuration.get("engines");
+    const ignorePackages = enginesConfig?.get("ignorePackages") || [];
     const reportError = (message) => {
       report.reportError(0, `[yarn-plugin-engines] ${String(message)}`);
     };
@@ -67,11 +83,11 @@ var plugin = (() => {
     const processedExternalDependencies = /* @__PURE__ */ new Set();
     const optionalDependencies = /* @__PURE__ */ new Set();
     const enqueueDependency = (descriptor, manifest) => {
-      if (descriptor.range.startsWith("workspace:") || processedExternalDependencies.has(descriptor.descriptorHash) || neededDependencies.includes(descriptor.descriptorHash)) {
+      const pkgName = import_core.structUtils.stringifyIdent(descriptor);
+      if (descriptor.range.startsWith("workspace:") || processedExternalDependencies.has(descriptor.descriptorHash) || neededDependencies.includes(descriptor.descriptorHash) || ignorePackages.includes(pkgName)) {
         return;
       }
       neededDependencies.push(descriptor.descriptorHash);
-      const pkgName = import_core.structUtils.stringifyIdent(descriptor);
       if (manifest.raw.optionalDependencies?.[pkgName] || manifest.raw.dependenciesMeta?.[pkgName]?.optional === true || manifest.raw.peerDependenciesMeta?.[pkgName]?.optional === true) {
         optionalDependencies.add(descriptor.descriptorHash);
       }
@@ -146,7 +162,8 @@ var plugin = (() => {
     }
   };
   var plugin = {
-    hooks: { validateProjectAfterInstall }
+    hooks: { validateProjectAfterInstall },
+    configuration: configurationMap
   };
   var src_default = plugin;
   return __toCommonJS(src_exports);

@@ -3,5 +3,9 @@
     "composite": true
   },
   "include": [],
-  "references": [{ "path": "./plugins/npmrc" }, { "path": "./scripts" }]
+  "references": [
+    { "path": "./plugins/engines" },
+    { "path": "./plugins/npmrc" },
+    { "path": "./scripts" }
+  ]
 }

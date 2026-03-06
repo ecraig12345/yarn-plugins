@@ -15,3 +15,15 @@ If you'd like a non-minified version for debugging:
 ```
 yarn plugin import https://raw.githubusercontent.com/ecraig12345/yarn-plugins/engines_v0.1.0/plugins/engines/dist/plugin.dev.js
 ```
+
+## Options
+
+Optional configuration in `.yarnrc.yml`:
+
+```yml
+engines:
+  # Ignore these package names and their dependencies when checking engines
+  ignorePackages:
+    - pkg1
+    - pkg2
+```

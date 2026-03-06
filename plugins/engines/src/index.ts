@@ -1,14 +1,42 @@
 import {
   Manifest,
+  SettingsType,
   structUtils,
+  type ConfigurationDefinitionMap,
+  type ConfigurationValueMap,
   type Descriptor,
   type DescriptorHash,
   type Hooks,
   type Plugin,
   type Report,
+  type miscUtils,
 } from '@yarnpkg/core';
 import { NodeFS } from '@yarnpkg/fslib';
 import semver from 'semver';
+
+interface EnginesConfig {
+  engines: miscUtils.ToMapValue<{
+    ignorePackages: string[];
+  }> | null;
+}
+
+const configurationMap: ConfigurationDefinitionMap<EnginesConfig> &
+  // we don't provide any of these built-in properties; this just satisfies the plugin type later
+  Partial<ConfigurationDefinitionMap<ConfigurationValueMap>> = {
+  engines: {
+    description: 'Config for yarn-plugin-engines',
+    type: SettingsType.SHAPE,
+    properties: {
+      ignorePackages: {
+        description:
+          'List of packages to ignore when validating engines.node (also ignores their dependencies)',
+        type: SettingsType.STRING,
+        isArray: true,
+        default: [],
+      },
+    },
+  },
+};
 
 /**
  * Recursively find non-dev dependencies of published packages, and verify that any `engines.node`
@@ -20,6 +48,10 @@ const validateProjectAfterInstall: Hooks['validateProjectAfterInstall'] = async 
   report,
 ) => {
   const nodeFs = new NodeFS();
+  const enginesConfig = project.configuration.get('engines') as
+    | EnginesConfig['engines']
+    | undefined;
+  const ignorePackages = enginesConfig?.get('ignorePackages') || [];
 
   const reportError = (message: unknown) => {
     report.reportError(0, `[yarn-plugin-engines] ${String(message)}`);
@@ -52,10 +84,12 @@ const validateProjectAfterInstall: Hooks['validateProjectAfterInstall'] = async 
 
   /** Queue a descriptor for processing if not already queued/processed */
   const enqueueDependency = (descriptor: Descriptor, manifest: Manifest) => {
+    const pkgName = structUtils.stringifyIdent(descriptor);
     if (
       descriptor.range.startsWith('workspace:') ||
       processedExternalDependencies.has(descriptor.descriptorHash) ||
-      neededDependencies.includes(descriptor.descriptorHash)
+      neededDependencies.includes(descriptor.descriptorHash) ||
+      ignorePackages.includes(pkgName)
     ) {
       return;
     }
@@ -64,7 +98,6 @@ const validateProjectAfterInstall: Hooks['validateProjectAfterInstall'] = async 
 
     // Check all the places a dep can be specified as optional
     // (it's probably not important to be strict about deps vs peers here)
-    const pkgName = structUtils.stringifyIdent(descriptor);
     if (
       manifest.raw.optionalDependencies?.[pkgName] ||
       manifest.raw.dependenciesMeta?.[pkgName]?.optional === true ||
@@ -174,6 +207,7 @@ const validateProjectAfterInstall: Hooks['validateProjectAfterInstall'] = async 
 
 const plugin: Plugin = {
   hooks: { validateProjectAfterInstall },
+  configuration: configurationMap,
 };
 
 export default plugin;
