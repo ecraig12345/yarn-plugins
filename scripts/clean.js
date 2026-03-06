@@ -1,4 +1,8 @@
 const fs = require('fs');
-const paths = require('./paths');
+const { getAllPluginData } = require('./getPluginData');
 
-fs.rmSync(paths.bundles, { recursive: true, force: true });
+const plugins = getAllPluginData();
+for (const plugin of plugins) {
+  // Delete the @yarnpkg/builder raw output
+  fs.rmSync(plugin.paths.bundles, { recursive: true, force: true });
+}

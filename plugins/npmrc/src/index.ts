@@ -64,7 +64,7 @@ const getNpmAuthenticationHeader: NpmHooks['getNpmAuthenticationHeader'] = async
 
   if (!npmrc) {
     // Delay load this since auth is irrelevant for many commands
-    const { loadNpmrc } = await import('./loadNpmrc');
+    const { loadNpmrc } = await import('./loadNpmrc.js');
     try {
       npmrc = await loadNpmrc({
         projectRoot: configuration.projectCwd,
@@ -79,7 +79,7 @@ const getNpmAuthenticationHeader: NpmHooks['getNpmAuthenticationHeader'] = async
   const credentials = npmrc.getCredentialsByURI(registry);
 
   if (credentials.certfile || credentials.keyfile) {
-    const { throwError } = await import('./errors');
+    const { throwError } = await import('./errors.js');
     throwError(
       `This plugin does not support certfile or keyfile auth (for registry "${registry}")`,
     );

@@ -4,9 +4,8 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "build": "yarn tsc -b && node scripts/build.js",
-    "clean": "node scripts/clean.js",
-    "release": "node scripts/release.js"
+    "build": "yarn tsc -b && node scripts/build.js --all",
+    "clean": "node scripts/clean.js"
   },
   "workspaces": [
     "plugins/*"
@@ -14,11 +13,13 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/semver": "^7.0.0",
-    "@types/which": "^3.0.4",
     "@yarnpkg/builder": "^4.2.2",
+    "nano-spawn": "^2.0.0",
     "prettier": "^3.6.2",
     "semver": "^7.7.2",
-    "typescript": "^5.5.2"
+    "syncpack": "^14.0.1",
+    "typescript": "^5.5.2",
+    "workspace-tools": "^0.41.0"
   },
   "resolutions": {
     "glob@npm:^10.2.2": "^13.0.0",

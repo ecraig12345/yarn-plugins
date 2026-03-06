@@ -1,8 +1,8 @@
 import NpmConfig from '@npmcli/config';
 import fs from 'fs';
 import which from 'which';
-import { pluginName } from './constants';
-import { throwError } from './errors';
+import { pluginName } from './constants.js';
+import { throwError } from './errors.js';
 
 /**
  * Read the effective npm config, with the same logic as npm: applying `process.env.npm_config_*`,

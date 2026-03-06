@@ -36,4 +36,4 @@ jobs:
       - name: Check for modified files
         uses: ecraig12345/beachball-actions/check-for-modified-files@336d3a84a5c452f5264803f4c62c6c34b4a51fbe # v2
         with:
-          extraError: If files under "dist/" were changed, please run "yarn build" and commit the changes.
+          extraError: If files under "plugins/*/dist/" were changed, please run "yarn build" and commit the changes.
