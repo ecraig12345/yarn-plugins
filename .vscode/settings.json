@@ -4,5 +4,8 @@
     "**/node_modules": true,
     "**/bundles": true,
     "**/.yarn": true
+  },
+  "files.associations": {
+    "*.json5": "jsonc"
   }
 }

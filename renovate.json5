@@ -1,0 +1,18 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "github>microsoft/m365-renovate-config",
+    "github>microsoft/m365-renovate-config:groupMore",
+    "github>microsoft/m365-renovate-config:keepFresh",
+    "github>microsoft/m365-renovate-config:restrictNode(20)"
+  ],
+  "ignorePresets": ["github>microsoft/m365-renovate-config:dependencyDashboardMajor"],
+
+  "labels": ["renovate"],
+  "reviewers": ["ecraig12345"],
+  "dependencyDashboard": true,
+
+  "lockFileMaintenance": {
+    "schedule": ["before 5am on the 1st day of the month"]
+  }
+}

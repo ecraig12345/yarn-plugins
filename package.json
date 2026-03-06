@@ -35,9 +35,5 @@
       "tar@npm:^6.0.5": "Fix security issue (API is compatible)"
     }
   },
-  "prettier": {
-    "printWidth": 100,
-    "singleQuote": true
-  },
   "packageManager": "yarn@4.12.0"
 }
