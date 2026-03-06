@@ -37,6 +37,6 @@ jobs:
 
       # This will fail on missing dist-file updates
       - name: Check for modified files
-        uses: ecraig12345/beachball-actions/check-for-modified-files@336d3a84a5c452f5264803f4c62c6c34b4a51fbe # v2
+        uses: ecraig12345/beachball-actions/check-for-modified-files@7ed69ce71cfb498c9bc76063e48858812ad85661 # v2
         with:
           extraError: If files under "plugins/*/dist/" were changed, please run "yarn build" and commit the changes.
