@@ -13,6 +13,7 @@ import {
 } from '@yarnpkg/core';
 import { NodeFS } from '@yarnpkg/fslib';
 import semver from 'semver';
+import { isRangeSatisfied, parseRange } from './ranges.js';
 
 interface EnginesConfig {
   engines: miscUtils.ToMapValue<{
@@ -71,20 +72,15 @@ const validateProjectAfterInstall: Hooks['validateProjectAfterInstall'] = async 
     return;
   }
 
-  let requiredRange: semver.Range | undefined;
-  try {
-    requiredRange = new semver.Range(rangeStr);
-  } catch {
-    // ignore
-  }
-  if (!requiredRange?.range) {
+  const repoRange = parseRange(rangeStr);
+  if (!repoRange) {
     reportError(`Invalid semver range "${rangeStr}" in package.json engines.node`);
     return;
   }
 
-  if (!semver.satisfies(process.versions.node, requiredRange)) {
+  if (!semver.satisfies(process.versions.node, repoRange)) {
     reportError(
-      `The current Node version ${process.versions.node} does not satisfy ${requiredRange.raw}`,
+      `The current Node version ${process.versions.node} does not satisfy ${repoRange.raw}`,
     );
     return;
   }
@@ -112,9 +108,9 @@ const validateProjectAfterInstall: Hooks['validateProjectAfterInstall'] = async 
     const pkgName = structUtils.stringifyIdent(descriptor);
     if (
       descriptor.range.startsWith('workspace:') ||
+      ignorePackages.includes(pkgName) ||
       processedDependencies.has(descriptor.descriptorHash) ||
-      dependenciesQueue.includes(descriptor.descriptorHash) ||
-      ignorePackages.includes(pkgName)
+      dependenciesQueue.includes(descriptor.descriptorHash)
     ) {
       return;
     }
@@ -158,9 +154,6 @@ const validateProjectAfterInstall: Hooks['validateProjectAfterInstall'] = async 
 
   while (dependenciesQueue.length) {
     const descriptorHash = dependenciesQueue.shift()!;
-    if (processedDependencies.has(descriptorHash)) {
-      continue;
-    }
     processedDependencies.add(descriptorHash);
 
     const desc = project.storedDescriptors.get(descriptorHash);
@@ -202,8 +195,8 @@ const validateProjectAfterInstall: Hooks['validateProjectAfterInstall'] = async 
       continue;
     }
 
-    const manifestRange = semver.validRange(manifest.raw.engines?.node);
-    if (manifestRange && !semver.intersects(manifestRange, requiredRange)) {
+    const manifestRange: string | undefined = manifest.raw.engines?.node;
+    if (manifestRange && !isRangeSatisfied({ repoRange, manifestRange })) {
       unsatisfiedNodeReqs[manifestRange] ??= new Set();
       unsatisfiedNodeReqs[manifestRange].add(structUtils.prettyLocator(project.configuration, pkg));
     }
@@ -218,7 +211,7 @@ const validateProjectAfterInstall: Hooks['validateProjectAfterInstall'] = async 
 
   for (const [nodeReq, pkgs] of Object.entries(unsatisfiedNodeReqs)) {
     reportError(
-      `The following packages require Node ${nodeReq}, which does not match the repo requirement ${requiredRange.raw}:\n` +
+      `The following packages require Node ${nodeReq}, which does not match the repo requirement ${repoRange.raw}:\n` +
         [...pkgs]
           .sort()
           .map((pkg) => `  - ${pkg}`)

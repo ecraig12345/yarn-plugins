@@ -7,7 +7,8 @@
     "build": "yarn tsc -b && node scripts/build.js --all",
     "clean": "node scripts/clean.js",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test": "vitest run"
   },
   "workspaces": [
     "plugins/*"
@@ -21,6 +22,7 @@
     "semver": "^7.7.2",
     "syncpack": "^14.0.1",
     "typescript": "^5.5.2",
+    "vitest": "^4.0.18",
     "workspace-tools": "^0.41.0"
   },
   "resolutions": {

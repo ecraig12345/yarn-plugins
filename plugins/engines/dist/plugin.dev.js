@@ -46,7 +46,25 @@ var plugin = (() => {
   });
   var import_core = __require("@yarnpkg/core");
   var import_fslib = __require("@yarnpkg/fslib");
+  var import_semver2 = __toESM(__require("semver"));
+
+  // src/ranges.ts
   var import_semver = __toESM(__require("semver"));
+  function parseRange(range) {
+    try {
+      const rangeObj = new import_semver.default.Range(range || "");
+      return rangeObj.range || rangeObj.raw === "*" ? rangeObj : null;
+    } catch {
+      return null;
+    }
+  }
+  function isRangeSatisfied(params) {
+    const { repoRange, manifestRange } = params;
+    const manifestSemver = parseRange(manifestRange);
+    return !manifestSemver || import_semver.default.subset(repoRange, manifestSemver);
+  }
+
+  // src/index.ts
   var configurationMap = {
     engines: {
       description: "Config for yarn-plugin-engines",
@@ -79,18 +97,14 @@ var plugin = (() => {
       reportError("Missing package.json engines.node field");
       return;
     }
-    let requiredRange;
-    try {
-      requiredRange = new import_semver.default.Range(rangeStr);
-    } catch {
-    }
-    if (!requiredRange?.range) {
+    const repoRange = parseRange(rangeStr);
+    if (!repoRange) {
       reportError(`Invalid semver range "${rangeStr}" in package.json engines.node`);
       return;
     }
-    if (!import_semver.default.satisfies(process.versions.node, requiredRange)) {
+    if (!import_semver2.default.satisfies(process.versions.node, repoRange)) {
       reportError(
-        `The current Node version ${process.versions.node} does not satisfy ${requiredRange.raw}`
+        `The current Node version ${process.versions.node} does not satisfy ${repoRange.raw}`
       );
       return;
     }
@@ -104,7 +118,7 @@ var plugin = (() => {
     const optionalDependencies = /* @__PURE__ */ new Set();
     const enqueueDependency = (descriptor, manifest) => {
       const pkgName = import_core.structUtils.stringifyIdent(descriptor);
-      if (descriptor.range.startsWith("workspace:") || processedDependencies.has(descriptor.descriptorHash) || dependenciesQueue.includes(descriptor.descriptorHash) || ignorePackages.includes(pkgName)) {
+      if (descriptor.range.startsWith("workspace:") || ignorePackages.includes(pkgName) || processedDependencies.has(descriptor.descriptorHash) || dependenciesQueue.includes(descriptor.descriptorHash)) {
         return;
       }
       dependenciesQueue.push(descriptor.descriptorHash);
@@ -128,9 +142,6 @@ var plugin = (() => {
     const unsatisfiedNodeReqs = {};
     while (dependenciesQueue.length) {
       const descriptorHash = dependenciesQueue.shift();
-      if (processedDependencies.has(descriptorHash)) {
-        continue;
-      }
       processedDependencies.add(descriptorHash);
       const desc = project.storedDescriptors.get(descriptorHash);
       const prettyDesc = desc ? import_core.structUtils.prettyDescriptor(project.configuration, desc) : descriptorHash;
@@ -162,8 +173,8 @@ var plugin = (() => {
         reportError(`Could not find package.json for ${prettyDesc} at ${location}`);
         continue;
       }
-      const manifestRange = import_semver.default.validRange(manifest.raw.engines?.node);
-      if (manifestRange && !import_semver.default.intersects(manifestRange, requiredRange)) {
+      const manifestRange = manifest.raw.engines?.node;
+      if (manifestRange && !isRangeSatisfied({ repoRange, manifestRange })) {
         unsatisfiedNodeReqs[manifestRange] ??= /* @__PURE__ */ new Set();
         unsatisfiedNodeReqs[manifestRange].add(import_core.structUtils.prettyLocator(project.configuration, pkg));
       }
@@ -173,7 +184,7 @@ var plugin = (() => {
     }
     for (const [nodeReq, pkgs] of Object.entries(unsatisfiedNodeReqs)) {
       reportError(
-        `The following packages require Node ${nodeReq}, which does not match the repo requirement ${requiredRange.raw}:
+        `The following packages require Node ${nodeReq}, which does not match the repo requirement ${repoRange.raw}:
 ` + [...pkgs].sort().map((pkg) => `  - ${pkg}`).join("\n")
       );
     }

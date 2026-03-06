@@ -6,7 +6,8 @@
   "main": "./src/index.ts",
   "scripts": {
     "build": "yarn run -T tsc -b && node ../../scripts/build.js",
-    "release": "node ../../scripts/release.js"
+    "release": "node ../../scripts/release.js",
+    "test": "yarn run -T vitest run"
   },
   "dependencies": {
     "@yarnpkg/core": "^4.4.2",
