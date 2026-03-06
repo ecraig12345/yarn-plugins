@@ -2,6 +2,7 @@ const fs = require('fs');
 const semver = require('semver');
 const { git } = require('workspace-tools');
 const { getPluginData } = require('./getPluginData');
+const { runBuild } = require('./runBuild');
 
 /**
  * Release a single plugin package.
@@ -30,7 +31,7 @@ async function run() {
   const newTag = `${pkg.shortName}_v${newVersion}`;
 
   // generate the bundles
-  require('./build');
+  await runBuild(pkg);
 
   console.log(`Updating package.json version from ${oldVersion} to ${newVersion}`);
   packageJsonText = packageJsonText.replace(oldVersion, newVersion);
@@ -61,6 +62,6 @@ async function run() {
 }
 
 run().catch((error) => {
-  console.error(error);
+  console.error(/** @type {Error} */ (error).message || error);
   process.exit(1);
 });
