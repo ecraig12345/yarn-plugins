@@ -1,6 +1,6 @@
 # `yarn-plugin-engines`
 
-Recursively find non-dev dependencies of published packages within the repo, and verify that any `engines.node` requirements match the version from the root `package.json`'s `engines.node`. (Yarn v1 would verify this automatically, but v2+ does not...)
+Recursively find non-dev dependencies of published packages within the repo, and verify that any `engines.node` requirements match the version from the root `package.json`'s `engines.node`. (Yarn v1 would verify this automatically, but [v2+ does not](https://github.com/yarnpkg/berry/issues/1177)...)
 
 ## Install
 
