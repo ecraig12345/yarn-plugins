@@ -23,6 +23,7 @@ interface EnginesConfig {
   engines: miscUtils.ToMapValue<{
     ignorePackages: string[];
     includeDevDependencies: boolean;
+    loose: boolean;
     verbose: boolean;
   }> | null;
 }
@@ -44,6 +45,12 @@ const configurationMap: ConfigurationDefinitionMap<EnginesConfig> &
       includeDevDependencies: {
         description:
           'Whether to include local dev dependencies and private packages when validating engines.node',
+        type: SettingsType.BOOLEAN,
+        default: false,
+      },
+      loose: {
+        description:
+          'If true, only validate that the minimum allowed Node version for the repo satisfies the manifest requirements, instead of requiring the full ranges to overlap',
         type: SettingsType.BOOLEAN,
         default: false,
       },
@@ -72,6 +79,7 @@ const validateProjectAfterInstall: NonNullable<Hooks['validateProjectAfterInstal
     | undefined;
   const ignorePackages = enginesConfig?.get('ignorePackages') || [];
   const includeDevDependencies = !!enginesConfig?.get('includeDevDependencies');
+  const loose = !!enginesConfig?.get('loose');
   const verbose = !!enginesConfig?.get('verbose');
   const linkerName = (project.configuration.get('nodeLinker') as string) || 'node-modules';
 
@@ -215,7 +223,7 @@ const validateProjectAfterInstall: NonNullable<Hooks['validateProjectAfterInstal
     }
 
     const manifestRange: string | undefined = manifest.raw.engines?.node;
-    if (manifestRange && !isRangeSatisfied({ repoRange, manifestRange })) {
+    if (manifestRange && !isRangeSatisfied({ repoRange, manifestRange, loose })) {
       unsatisfiedNodeReqs[manifestRange] ??= new Set();
       unsatisfiedNodeReqs[manifestRange].add(structUtils.prettyLocator(project.configuration, pkg));
     }

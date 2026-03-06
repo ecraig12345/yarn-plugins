@@ -29,6 +29,11 @@ engines:
   ignorePackages:
     - pkg1
     - pkg2
+  # If true, only validate that the minimum allowed Node version for the repo
+  # satisfies the manifest requirements, instead of requiring the full ranges
+  # to overlap. This is useful if e.g. the repo specifies >=20 but some manifest
+  # specifies ^20 || >=22.
+  loose: true
   # Include verbose warnings (such as for missing optional deps)
   verbose: true
 ```

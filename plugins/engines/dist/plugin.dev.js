@@ -60,9 +60,12 @@ var plugin = (() => {
     }
   }
   function isRangeSatisfied(params) {
-    const { repoRange, manifestRange } = params;
+    const { repoRange, manifestRange, loose } = params;
     const manifestSemver = parseRange(manifestRange);
-    return !manifestSemver || import_semver.default.subset(repoRange, manifestSemver);
+    if (!manifestSemver) {
+      return true;
+    }
+    return loose ? import_semver.default.satisfies(import_semver.default.minVersion(repoRange), manifestSemver) : import_semver.default.subset(repoRange, manifestSemver);
   }
 
   // src/index.ts
@@ -82,6 +85,11 @@ var plugin = (() => {
           type: import_core.SettingsType.BOOLEAN,
           default: false
         },
+        loose: {
+          description: "If true, only validate that the minimum allowed Node version for the repo satisfies the manifest requirements, instead of requiring the full ranges to overlap",
+          type: import_core.SettingsType.BOOLEAN,
+          default: false
+        },
         verbose: {
           description: "Enable verbose warnings for debugging",
           type: import_core.SettingsType.BOOLEAN,
@@ -95,6 +103,7 @@ var plugin = (() => {
     const enginesConfig = project.configuration.get("engines");
     const ignorePackages = enginesConfig?.get("ignorePackages") || [];
     const includeDevDependencies = !!enginesConfig?.get("includeDevDependencies");
+    const loose = !!enginesConfig?.get("loose");
     const verbose = !!enginesConfig?.get("verbose");
     const linkerName = project.configuration.get("nodeLinker") || "node-modules";
     const reportError = (message) => {
@@ -189,7 +198,7 @@ var plugin = (() => {
         continue;
       }
       const manifestRange = manifest.raw.engines?.node;
-      if (manifestRange && !isRangeSatisfied({ repoRange, manifestRange })) {
+      if (manifestRange && !isRangeSatisfied({ repoRange, manifestRange, loose })) {
         unsatisfiedNodeReqs[manifestRange] ??= /* @__PURE__ */ new Set();
         unsatisfiedNodeReqs[manifestRange].add(import_core.structUtils.prettyLocator(project.configuration, pkg));
       }

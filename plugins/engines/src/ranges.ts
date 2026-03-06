@@ -20,8 +20,14 @@ export function parseRange(range: string | null | undefined): semver.Range | nul
 export function isRangeSatisfied(params: {
   repoRange: string | semver.Range;
   manifestRange: string | null | undefined;
+  loose?: boolean;
 }): boolean {
-  const { repoRange, manifestRange } = params;
+  const { repoRange, manifestRange, loose } = params;
   const manifestSemver = parseRange(manifestRange);
-  return !manifestSemver || semver.subset(repoRange, manifestSemver);
+  if (!manifestSemver) {
+    return true;
+  }
+  return loose
+    ? semver.satisfies(semver.minVersion(repoRange)!, manifestSemver)
+    : semver.subset(repoRange, manifestSemver);
 }
