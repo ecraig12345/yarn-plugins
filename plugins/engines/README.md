@@ -22,6 +22,9 @@ Optional configuration in `.yarnrc.yml`:
 
 ```yml
 engines:
+  # By default, local devDependencies and private packages are excluded.
+  # Set this to include them.
+  includeDevDependencies: true
   # Ignore these package names and their dependencies when checking engines
   ignorePackages:
     - pkg1

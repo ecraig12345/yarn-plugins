@@ -17,6 +17,7 @@ import semver from 'semver';
 interface EnginesConfig {
   engines: miscUtils.ToMapValue<{
     ignorePackages: string[];
+    includeDevDependencies: boolean;
   }> | null;
 }
 
@@ -33,6 +34,12 @@ const configurationMap: ConfigurationDefinitionMap<EnginesConfig> &
         type: SettingsType.STRING,
         isArray: true,
         default: [],
+      },
+      includeDevDependencies: {
+        description:
+          'Whether to include local dev dependencies and private packages when validating engines.node',
+        type: SettingsType.BOOLEAN,
+        default: false,
       },
     },
   },
@@ -52,10 +59,35 @@ const validateProjectAfterInstall: Hooks['validateProjectAfterInstall'] = async 
     | EnginesConfig['engines']
     | undefined;
   const ignorePackages = enginesConfig?.get('ignorePackages') || [];
+  const includeDevDependencies = !!enginesConfig?.get('includeDevDependencies');
 
   const reportError = (message: unknown) => {
     report.reportError(0, `[yarn-plugin-engines] ${String(message)}`);
   };
+
+  const rangeStr = project.topLevelWorkspace.manifest.raw.engines?.node;
+  if (!rangeStr) {
+    reportError('Missing package.json engines.node field');
+    return;
+  }
+
+  let requiredRange: semver.Range | undefined;
+  try {
+    requiredRange = new semver.Range(rangeStr);
+  } catch {
+    // ignore
+  }
+  if (!requiredRange?.range) {
+    reportError(`Invalid semver range "${rangeStr}" in package.json engines.node`);
+    return;
+  }
+
+  if (!semver.satisfies(process.versions.node, requiredRange)) {
+    reportError(
+      `The current Node version ${process.versions.node} does not satisfy ${requiredRange.raw}`,
+    );
+    return;
+  }
 
   // Get the enabled linker. There's exactly one enabled linker per project, so we can find
   // the supported linker for any package (a workspace package is most easily available)
@@ -69,16 +101,9 @@ const validateProjectAfterInstall: Hooks['validateProjectAfterInstall'] = async 
     return;
   }
 
-  const repoNodeReq = project.topLevelWorkspace.manifest.raw.engines?.node;
-  const repoNodeMin = repoNodeReq && semver.minVersion(repoNodeReq)?.toString();
-  if (!repoNodeMin) {
-    reportError('Could not find engines.node requirement in the top-level package.json');
-    return;
-  }
-
-  /** non-dev deps detected but not yet found/processed */
-  const neededDependencies: DescriptorHash[] = [];
-  const processedExternalDependencies = new Set<DescriptorHash>();
+  /** deps detected but not yet found/processed */
+  const dependenciesQueue: DescriptorHash[] = [];
+  const processedDependencies = new Set<DescriptorHash>();
   /** deps marked as optional by at least one manifest */
   const optionalDependencies = new Set<DescriptorHash>();
 
@@ -87,14 +112,14 @@ const validateProjectAfterInstall: Hooks['validateProjectAfterInstall'] = async 
     const pkgName = structUtils.stringifyIdent(descriptor);
     if (
       descriptor.range.startsWith('workspace:') ||
-      processedExternalDependencies.has(descriptor.descriptorHash) ||
-      neededDependencies.includes(descriptor.descriptorHash) ||
+      processedDependencies.has(descriptor.descriptorHash) ||
+      dependenciesQueue.includes(descriptor.descriptorHash) ||
       ignorePackages.includes(pkgName)
     ) {
       return;
     }
 
-    neededDependencies.push(descriptor.descriptorHash);
+    dependenciesQueue.push(descriptor.descriptorHash);
 
     // Check all the places a dep can be specified as optional
     // (it's probably not important to be strict about deps vs peers here)
@@ -112,7 +137,7 @@ const validateProjectAfterInstall: Hooks['validateProjectAfterInstall'] = async 
   // matching storedResolutions, including virtual hashes for packages with peer deps),
   // but filter by idents from the manifest's dependencies/peerDependencies to exclude devDeps.
   for (const workspace of project.workspaces) {
-    if (workspace.manifest.private) continue;
+    if (workspace.manifest.private && !includeDevDependencies) continue;
 
     const wsPkg = project.storedPackages.get(workspace.anchoredLocator.locatorHash);
     if (!wsPkg) continue;
@@ -120,7 +145,7 @@ const validateProjectAfterInstall: Hooks['validateProjectAfterInstall'] = async 
     // Queue matching descriptors from the Package (which have correct hashes)
     for (const desc of wsPkg.dependencies.values()) {
       // Package.dependencies for workspaces also includes devDependencies, so ignore those
-      if (workspace.manifest.dependencies.has(desc.identHash)) {
+      if (includeDevDependencies || workspace.manifest.dependencies.has(desc.identHash)) {
         enqueueDependency(desc, workspace.manifest);
       }
     }
@@ -131,12 +156,12 @@ const validateProjectAfterInstall: Hooks['validateProjectAfterInstall'] = async 
 
   const unsatisfiedNodeReqs: Record<string, Set<string>> = {};
 
-  while (neededDependencies.length) {
-    const descriptorHash = neededDependencies.shift()!;
-    if (processedExternalDependencies.has(descriptorHash)) {
+  while (dependenciesQueue.length) {
+    const descriptorHash = dependenciesQueue.shift()!;
+    if (processedDependencies.has(descriptorHash)) {
       continue;
     }
-    processedExternalDependencies.add(descriptorHash);
+    processedDependencies.add(descriptorHash);
 
     const desc = project.storedDescriptors.get(descriptorHash);
     const prettyDesc = desc
@@ -177,13 +202,10 @@ const validateProjectAfterInstall: Hooks['validateProjectAfterInstall'] = async 
       continue;
     }
 
-    if (manifest.raw.engines?.node) {
-      const prettyPkg = structUtils.prettyLocator(project.configuration, pkg);
-      const minVersion = semver.minVersion(manifest.raw.engines.node)?.toString();
-      if (minVersion && semver.gt(minVersion, repoNodeMin)) {
-        unsatisfiedNodeReqs[minVersion] ??= new Set();
-        unsatisfiedNodeReqs[minVersion].add(prettyPkg);
-      }
+    const manifestRange = semver.validRange(manifest.raw.engines?.node);
+    if (manifestRange && !semver.intersects(manifestRange, requiredRange)) {
+      unsatisfiedNodeReqs[manifestRange] ??= new Set();
+      unsatisfiedNodeReqs[manifestRange].add(structUtils.prettyLocator(project.configuration, pkg));
     }
 
     // Recursively process this package's dependencies.
@@ -196,7 +218,7 @@ const validateProjectAfterInstall: Hooks['validateProjectAfterInstall'] = async 
 
   for (const [nodeReq, pkgs] of Object.entries(unsatisfiedNodeReqs)) {
     reportError(
-      `The following packages require Node ${nodeReq}, which is higher than the repo minimum ${repoNodeMin}:\n` +
+      `The following packages require Node ${nodeReq}, which does not match the repo requirement ${requiredRange.raw}:\n` +
         [...pkgs]
           .sort()
           .map((pkg) => `  - ${pkg}`)
