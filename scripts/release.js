@@ -42,15 +42,14 @@ async function run() {
   fs.writeFileSync(pkg.paths.readme, readmeText, 'utf8');
 
   // unstage anything previously staged
+  console.log('Staging changes and committing');
   git(['reset'], { cwd, throwOnError: true });
   // add the modified files and commit
-  git(['add', pkg.paths.packageJson, pkg.paths.readme, pkg.paths.dist], {
-    cwd,
-    throwOnError: true,
-  });
-  git(['commit', '-m', `"Bump ${pkg.name} version to ${newVersion}"`], { cwd, throwOnError: true });
+  git(['add', pkg.paths.packageRoot], { cwd, throwOnError: true });
+  git(['commit', '-m', `Bump ${pkg.name} version to ${newVersion}`], { cwd, throwOnError: true });
 
   // tag and push the new version
+  console.log(`Tagging commit with ${newTag} and pushing to origin`);
   git(['tag', newTag], { cwd, throwOnError: true });
   git(['push', '--tags', 'origin', 'main'], { cwd, throwOnError: true });
 
