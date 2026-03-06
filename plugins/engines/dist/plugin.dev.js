@@ -57,6 +57,11 @@ var plugin = (() => {
           type: import_core.SettingsType.STRING,
           isArray: true,
           default: []
+        },
+        includeDevDependencies: {
+          description: "Whether to include local dev dependencies and private packages when validating engines.node",
+          type: import_core.SettingsType.BOOLEAN,
+          default: false
         }
       }
     }
@@ -65,39 +70,54 @@ var plugin = (() => {
     const nodeFs = new import_fslib.NodeFS();
     const enginesConfig = project.configuration.get("engines");
     const ignorePackages = enginesConfig?.get("ignorePackages") || [];
+    const includeDevDependencies = !!enginesConfig?.get("includeDevDependencies");
     const reportError = (message) => {
       report.reportError(0, `[yarn-plugin-engines] ${String(message)}`);
     };
+    const rangeStr = project.topLevelWorkspace.manifest.raw.engines?.node;
+    if (!rangeStr) {
+      reportError("Missing package.json engines.node field");
+      return;
+    }
+    let requiredRange;
+    try {
+      requiredRange = new import_semver.default.Range(rangeStr);
+    } catch {
+    }
+    if (!requiredRange?.range) {
+      reportError(`Invalid semver range "${rangeStr}" in package.json engines.node`);
+      return;
+    }
+    if (!import_semver.default.satisfies(process.versions.node, requiredRange)) {
+      reportError(
+        `The current Node version ${process.versions.node} does not satisfy ${requiredRange.raw}`
+      );
+      return;
+    }
     const linker = project.configuration.getLinkers().find((linker2) => linker2.supportsPackage(project.workspaces[0].anchoredPackage, { project }));
     if (!linker) {
       reportError("No supported linker found");
       return;
     }
-    const repoNodeReq = project.topLevelWorkspace.manifest.raw.engines?.node;
-    const repoNodeMin = repoNodeReq && import_semver.default.minVersion(repoNodeReq)?.toString();
-    if (!repoNodeMin) {
-      reportError("Could not find engines.node requirement in the top-level package.json");
-      return;
-    }
-    const neededDependencies = [];
-    const processedExternalDependencies = /* @__PURE__ */ new Set();
+    const dependenciesQueue = [];
+    const processedDependencies = /* @__PURE__ */ new Set();
     const optionalDependencies = /* @__PURE__ */ new Set();
     const enqueueDependency = (descriptor, manifest) => {
       const pkgName = import_core.structUtils.stringifyIdent(descriptor);
-      if (descriptor.range.startsWith("workspace:") || processedExternalDependencies.has(descriptor.descriptorHash) || neededDependencies.includes(descriptor.descriptorHash) || ignorePackages.includes(pkgName)) {
+      if (descriptor.range.startsWith("workspace:") || processedDependencies.has(descriptor.descriptorHash) || dependenciesQueue.includes(descriptor.descriptorHash) || ignorePackages.includes(pkgName)) {
         return;
       }
-      neededDependencies.push(descriptor.descriptorHash);
+      dependenciesQueue.push(descriptor.descriptorHash);
       if (manifest.raw.optionalDependencies?.[pkgName] || manifest.raw.dependenciesMeta?.[pkgName]?.optional === true || manifest.raw.peerDependenciesMeta?.[pkgName]?.optional === true) {
         optionalDependencies.add(descriptor.descriptorHash);
       }
     };
     for (const workspace of project.workspaces) {
-      if (workspace.manifest.private) continue;
+      if (workspace.manifest.private && !includeDevDependencies) continue;
       const wsPkg = project.storedPackages.get(workspace.anchoredLocator.locatorHash);
       if (!wsPkg) continue;
       for (const desc of wsPkg.dependencies.values()) {
-        if (workspace.manifest.dependencies.has(desc.identHash)) {
+        if (includeDevDependencies || workspace.manifest.dependencies.has(desc.identHash)) {
           enqueueDependency(desc, workspace.manifest);
         }
       }
@@ -106,12 +126,12 @@ var plugin = (() => {
       }
     }
     const unsatisfiedNodeReqs = {};
-    while (neededDependencies.length) {
-      const descriptorHash = neededDependencies.shift();
-      if (processedExternalDependencies.has(descriptorHash)) {
+    while (dependenciesQueue.length) {
+      const descriptorHash = dependenciesQueue.shift();
+      if (processedDependencies.has(descriptorHash)) {
         continue;
       }
-      processedExternalDependencies.add(descriptorHash);
+      processedDependencies.add(descriptorHash);
       const desc = project.storedDescriptors.get(descriptorHash);
       const prettyDesc = desc ? import_core.structUtils.prettyDescriptor(project.configuration, desc) : descriptorHash;
       const locatorHash = project.storedResolutions.get(descriptorHash);
@@ -142,13 +162,10 @@ var plugin = (() => {
         reportError(`Could not find package.json for ${prettyDesc} at ${location}`);
         continue;
       }
-      if (manifest.raw.engines?.node) {
-        const prettyPkg = import_core.structUtils.prettyLocator(project.configuration, pkg);
-        const minVersion = import_semver.default.minVersion(manifest.raw.engines.node)?.toString();
-        if (minVersion && import_semver.default.gt(minVersion, repoNodeMin)) {
-          unsatisfiedNodeReqs[minVersion] ??= /* @__PURE__ */ new Set();
-          unsatisfiedNodeReqs[minVersion].add(prettyPkg);
-        }
+      const manifestRange = import_semver.default.validRange(manifest.raw.engines?.node);
+      if (manifestRange && !import_semver.default.intersects(manifestRange, requiredRange)) {
+        unsatisfiedNodeReqs[manifestRange] ??= /* @__PURE__ */ new Set();
+        unsatisfiedNodeReqs[manifestRange].add(import_core.structUtils.prettyLocator(project.configuration, pkg));
       }
       for (const dep of pkg.dependencies.values()) {
         enqueueDependency(dep, manifest);
@@ -156,7 +173,7 @@ var plugin = (() => {
     }
     for (const [nodeReq, pkgs] of Object.entries(unsatisfiedNodeReqs)) {
       reportError(
-        `The following packages require Node ${nodeReq}, which is higher than the repo minimum ${repoNodeMin}:
+        `The following packages require Node ${nodeReq}, which does not match the repo requirement ${requiredRange.raw}:
 ` + [...pkgs].sort().map((pkg) => `  - ${pkg}`).join("\n")
       );
     }
