@@ -1,6 +1,6 @@
 {
   "name": "yarn-plugin-npmrc",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "private": true,
   "license": "MIT",
   "main": "./src/index.ts",
