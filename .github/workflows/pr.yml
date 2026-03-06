@@ -31,7 +31,10 @@ jobs:
       - run: yarn --immutable
 
       - run: yarn format:check
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+
       - run: yarn syncpack lint
+        if: ${{ matrix.os == 'ubuntu-latest' }}
 
       - run: yarn build
 
