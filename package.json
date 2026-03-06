@@ -5,7 +5,9 @@
   "license": "MIT",
   "scripts": {
     "build": "yarn tsc -b && node scripts/build.js --all",
-    "clean": "node scripts/clean.js"
+    "clean": "node scripts/clean.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "workspaces": [
     "plugins/*"

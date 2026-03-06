@@ -1,0 +1,15 @@
+{
+  "name": "yarn-plugin-engines",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "yarn run -T tsc -b && node ../../scripts/build.js",
+    "release": "node ../../scripts/release.js"
+  },
+  "dependencies": {
+    "@yarnpkg/core": "^4.4.2",
+    "semver": "^7.7.2"
+  }
+}

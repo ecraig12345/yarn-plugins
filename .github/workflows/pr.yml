@@ -30,6 +30,9 @@ jobs:
 
       - run: yarn --immutable
 
+      - run: yarn format:check
+      - run: yarn syncpack lint
+
       - run: yarn build
 
       # This will fail on missing dist-file updates

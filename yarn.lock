@@ -3216,6 +3216,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"yarn-plugin-engines@workspace:plugins/engines":
+  version: 0.0.0-use.local
+  resolution: "yarn-plugin-engines@workspace:plugins/engines"
+  dependencies:
+    "@yarnpkg/core": "npm:^4.4.2"
+    semver: "npm:^7.7.2"
+  languageName: unknown
+  linkType: soft
+
 "yarn-plugin-npmrc@workspace:plugins/npmrc":
   version: 0.0.0-use.local
   resolution: "yarn-plugin-npmrc@workspace:plugins/npmrc"
