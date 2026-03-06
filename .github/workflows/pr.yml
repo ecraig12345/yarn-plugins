@@ -40,6 +40,6 @@ jobs:
 
       # This will fail on missing dist-file updates
       - name: Check for modified files
-        uses: microsoft/beachball-actions/check-for-modified-files@cf7d34819ad50dce8894b3ff99a2a7899aefee3d # v2
+        uses: microsoft/beachball-actions/check-for-modified-files@cf7d34819ad50dce8894b3ff99a2a7899aefee3d # v3
         with:
           extraError: If files under "plugins/*/dist/" were changed, please run "yarn build" and commit the changes.
