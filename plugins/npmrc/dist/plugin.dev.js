@@ -1988,7 +1988,10 @@ var plugin = (() => {
         throw npmrcError;
       }
     }
-    const credentials = npmrc.getCredentialsByURI(registry);
+    let credentials = npmrc.getCredentialsByURI(registry);
+    if (Object.keys(credentials).length === 0 && !registry.endsWith("/")) {
+      credentials = npmrc.getCredentialsByURI(`${registry}/`);
+    }
     if (credentials.certfile || credentials.keyfile) {
       const { throwError: throwError2 } = await Promise.resolve().then(() => (init_errors(), errors_exports));
       throwError2(
