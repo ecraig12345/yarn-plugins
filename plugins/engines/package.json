@@ -10,7 +10,7 @@
     "test": "yarn run -T vitest run"
   },
   "dependencies": {
-    "@yarnpkg/core": "^4.4.2",
-    "semver": "^7.7.2"
+    "@yarnpkg/core": "^4.7.0",
+    "semver": "^7.7.4"
   }
 }
