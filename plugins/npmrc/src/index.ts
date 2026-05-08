@@ -76,7 +76,11 @@ const getNpmAuthenticationHeader: NpmHooks['getNpmAuthenticationHeader'] = async
     }
   }
 
-  const credentials = npmrc.getCredentialsByURI(registry);
+  let credentials = npmrc.getCredentialsByURI(registry);
+  if (Object.keys(credentials).length === 0 && !registry.endsWith('/')) {
+    // try with a trailing slash--otherwise npm config's nerfDart function might remove the last segment
+    credentials = npmrc.getCredentialsByURI(`${registry}/`);
+  }
 
   if (credentials.certfile || credentials.keyfile) {
     const { throwError } = await import('./errors.js');
