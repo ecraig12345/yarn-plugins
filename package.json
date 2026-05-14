@@ -21,7 +21,7 @@
     "prettier": "^3.8.3",
     "semver": "^7.7.4",
     "syncpack": "^14.0.1",
-    "typescript": "^5.9.0",
+    "typescript": "^6.0.0",
     "vitest": "^4.1.5",
     "workspace-tools": "^0.41.7"
   },
