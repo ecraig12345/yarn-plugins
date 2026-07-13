@@ -23,7 +23,7 @@
     "syncpack": "^15.0.0",
     "typescript": "^6.0.0",
     "vitest": "^4.1.5",
-    "workspace-tools": "^0.41.7"
+    "workspace-tools": "^0.42.0"
   },
   "resolutions": {
     "glob@npm:^10.2.2": "^13.0.0",

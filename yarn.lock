@@ -2387,14 +2387,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:^4.1.1":
-  version: 4.1.1
-  resolution: "js-yaml@npm:4.1.1"
+"js-yaml@npm:^4.2.0":
+  version: 4.3.0
+  resolution: "js-yaml@npm:4.3.0"
   dependencies:
     argparse: "npm:^2.0.1"
   bin:
     js-yaml: bin/js-yaml.js
-  checksum: 10c0/561c7d7088c40a9bb53cc75becbfb1df6ae49b34b5e6e5a81744b14ae8667ec564ad2527709d1a6e7d5e5fa6d483aa0f373a50ad98d42fde368ec4a190d4fae7
+  checksum: 10c0/058b30473d6915ca5b4feb11e2f7d4d97242f98d00a798ed48dd90b46b7c640398afe9128c5db22c5300f8c6528fe2a174b9a93f351a70ebc28c6203938d8bff
   languageName: node
   linkType: hard
 
@@ -3957,17 +3957,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"workspace-tools@npm:^0.41.7":
-  version: 0.41.7
-  resolution: "workspace-tools@npm:0.41.7"
+"workspace-tools@npm:^0.42.0":
+  version: 0.42.0
+  resolution: "workspace-tools@npm:0.42.0"
   dependencies:
     "@yarnpkg/lockfile": "npm:^1.1.0"
     fast-glob: "npm:^3.3.3"
     git-url-parse: "npm:^16.1.0"
     jju: "npm:^1.4.0"
-    js-yaml: "npm:^4.1.1"
+    js-yaml: "npm:^4.2.0"
     micromatch: "npm:^4.0.8"
-  checksum: 10c0/2bc9b8371711b75e2b0b29052bf2f06130f09701d4d3515d5fcf4b4f772cbfceb17e4317e324fdbe2cfaf9f8a0e3fe1cd912ff034960ff8ed5723f60f507f139
+  checksum: 10c0/a39edf688de49f3e183ab57ffd0b0740350048b2c5fc656bfee93ec9c438bd90b07b98033e52709f8d92b7eef65fc5c8c70632e47f972601650706819db3d114
   languageName: node
   linkType: hard
 
@@ -4054,7 +4054,7 @@ __metadata:
     syncpack: "npm:^15.0.0"
     typescript: "npm:^6.0.0"
     vitest: "npm:^4.1.5"
-    workspace-tools: "npm:^0.41.7"
+    workspace-tools: "npm:^0.42.0"
   languageName: unknown
   linkType: soft
 
