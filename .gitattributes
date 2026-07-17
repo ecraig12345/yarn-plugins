@@ -1,0 +1,3 @@
+# Built plugin bundles are checked in and always written with LF by esbuild.
+# Pin them to LF so they don't get CRLF-converted on Windows checkouts.
+plugins/*/dist/*.js text eol=lf

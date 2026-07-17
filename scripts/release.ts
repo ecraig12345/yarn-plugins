@@ -1,21 +1,20 @@
-const fs = require('fs');
-const semver = require('semver');
-const { git } = require('workspace-tools');
-const { getPluginData } = require('./getPluginData');
-const { runBuild } = require('./runBuild');
+import fs from 'node:fs';
+import semver from 'semver';
+import { git } from 'workspace-tools';
+import nanoSpawn from 'nano-spawn';
+import { getPluginData } from './getPluginData.ts';
+import { runBuild } from './runBuild.ts';
 
 /**
  * Release a single plugin package.
  */
 async function run() {
-  const nanoSpawn = (await import('nano-spawn')).default;
-
   const pkg = getPluginData(process.cwd());
   const cwd = pkg.paths.packageRoot;
 
-  const bumpType = /** @type {import('semver').ReleaseType} */ (process.argv[2]);
+  const bumpType = process.argv[2] as semver.ReleaseType;
   if (!['major', 'minor', 'patch'].includes(bumpType)) {
-    console.error('Usage: node scripts/release.js <major|minor|patch>');
+    console.error('Usage: node scripts/release.mts <major|minor|patch>');
     process.exit(1);
   }
 
@@ -62,6 +61,6 @@ async function run() {
 }
 
 run().catch((error) => {
-  console.error(/** @type {Error} */ (error).message || error);
+  console.error((error as Error).message || error);
   process.exit(1);
 });

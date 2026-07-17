@@ -1,6 +1,6 @@
-const fs = require('fs');
-const { getPluginData, getAllPluginData } = require('./getPluginData');
-const { runBuild } = require('./runBuild');
+import fs from 'node:fs';
+import { getPluginData, getAllPluginData } from './getPluginData.ts';
+import { runBuild } from './runBuild.ts';
 
 /**
  * Build the plugin package in the cwd, or all plugin packages with `--all`.
@@ -12,13 +12,11 @@ async function run() {
 
   for (const plugin of plugins) {
     fs.rmSync(plugin.paths.dist, { recursive: true, force: true });
-    fs.mkdirSync(plugin.paths.dist, { recursive: true });
-
     await runBuild(plugin);
   }
 }
 
 run().catch((error) => {
-  console.error(/** @type {Error} */ (error).message || error);
+  console.error((error as Error).stack || error);
   process.exit(1);
 });
