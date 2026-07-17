@@ -49,6 +49,41 @@ var plugin = (() => {
   var import_path = __toESM(__require("path"));
   var import_semver2 = __toESM(__require("semver"));
 
+  // plugins/engines/src/linker.ts
+  var EnginesProbeLinker = class _EnginesProbeLinker {
+    /** The cwds of projects whose link step ran during this process */
+    static linkedProjectCwds = /* @__PURE__ */ new Set();
+    /**
+     * Returns whether the link step ran for the given project.
+     * If not, its files aren't available on disk.
+     */
+    static wasProjectLinked(project) {
+      return _EnginesProbeLinker.linkedProjectCwds.has(project.cwd);
+    }
+    /** Called at the start of every link step, and used to determine whether linking occurred */
+    makeInstaller(opts) {
+      _EnginesProbeLinker.linkedProjectCwds.add(opts.project.cwd);
+      return new EnginesProbeInstaller();
+    }
+    supportsPackage = () => false;
+    findPackageLocation = () => {
+      throw new Error("Assertion failed: this code should never be called");
+    };
+    findPackageLocator = async () => null;
+    getCustomDataKey = () => "yarn-plugin-engines-probe";
+  };
+  var EnginesProbeInstaller = class {
+    attachCustomData = () => {
+    };
+    installPackage = async () => ({ packageLocation: null, buildRequest: null });
+    attachInternalDependencies = async () => {
+    };
+    attachExternalDependents = async () => {
+    };
+    finalizeInstall = async () => {
+    };
+  };
+
   // plugins/engines/src/ranges.ts
   var import_semver = __toESM(__require("semver"));
   function parseRange(range) {
@@ -112,6 +147,13 @@ var plugin = (() => {
     const verboseWarning = (message) => {
       verbose && report.reportWarning(0, `[yarn-plugin-engines] warning: ${String(message)}`);
     };
+    if (!EnginesProbeLinker.wasProjectLinked(project)) {
+      report.reportWarning(
+        0,
+        "[yarn-plugin-engines] Skipping validation because packages were not linked"
+      );
+      return;
+    }
     if (linkerName !== "pnpm" && linkerName !== "node-modules") {
       reportError(`This plugin is not compatible with the ${linkerName} linker`);
       return;
@@ -243,6 +285,7 @@ var plugin = (() => {
   }
   var plugin = {
     hooks: { validateProjectAfterInstall },
+    linkers: [EnginesProbeLinker],
     configuration: configurationMap
   };
   var index_default = plugin;

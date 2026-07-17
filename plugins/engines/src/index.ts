@@ -17,6 +17,7 @@ import {
 import { NodeFS, type PortablePath } from '@yarnpkg/fslib';
 import path from 'path';
 import semver from 'semver';
+import { EnginesProbeLinker } from './linker.js';
 import { isRangeSatisfied, parseRange } from './ranges.js';
 
 interface EnginesConfig {
@@ -89,6 +90,16 @@ const validateProjectAfterInstall: NonNullable<Hooks['validateProjectAfterInstal
   const verboseWarning = (message: unknown) => {
     verbose && report.reportWarning(0, `[yarn-plugin-engines] warning: ${String(message)}`);
   };
+
+  // If the link step didn't run (e.g. `yarn install --mode=update-lockfile`), packages haven't been
+  // installed on disk, so there's nothing to validate.
+  if (!EnginesProbeLinker.wasProjectLinked(project)) {
+    report.reportWarning(
+      0,
+      '[yarn-plugin-engines] Skipping validation because packages were not linked',
+    );
+    return;
+  }
 
   if (linkerName !== 'pnpm' && linkerName !== 'node-modules') {
     reportError(`This plugin is not compatible with the ${linkerName} linker`);
@@ -292,6 +303,7 @@ async function findPackageLocation(
 
 const plugin: Plugin = {
   hooks: { validateProjectAfterInstall },
+  linkers: [EnginesProbeLinker],
   configuration: configurationMap,
 };
 
