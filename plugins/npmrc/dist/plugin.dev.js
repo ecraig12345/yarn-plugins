@@ -54,9 +54,9 @@ var plugin = (() => {
   ));
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // ../../node_modules/ini/lib/ini.js
+  // node_modules/ini/lib/ini.js
   var require_ini = __commonJS({
-    "../../node_modules/ini/lib/ini.js"(exports, module) {
+    "node_modules/ini/lib/ini.js"(exports, module) {
       var { hasOwnProperty } = Object.prototype;
       var encode = (obj, opt = {}) => {
         if (typeof opt === "string") {
@@ -266,9 +266,9 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/@npmcli/config/node_modules/abbrev/lib/index.js
+  // node_modules/@npmcli/config/node_modules/abbrev/lib/index.js
   var require_lib = __commonJS({
-    "../../node_modules/@npmcli/config/node_modules/abbrev/lib/index.js"(exports, module) {
+    "node_modules/@npmcli/config/node_modules/abbrev/lib/index.js"(exports, module) {
       module.exports = abbrev;
       function abbrev(...args) {
         let list = args;
@@ -318,17 +318,17 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/@npmcli/config/node_modules/nopt/lib/debug.js
+  // node_modules/@npmcli/config/node_modules/nopt/lib/debug.js
   var require_debug = __commonJS({
-    "../../node_modules/@npmcli/config/node_modules/nopt/lib/debug.js"(exports, module) {
+    "node_modules/@npmcli/config/node_modules/nopt/lib/debug.js"(exports, module) {
       module.exports = process.env.DEBUG_NOPT || process.env.NOPT_DEBUG ? (...a) => console.error(...a) : () => {
       };
     }
   });
 
-  // ../../node_modules/@npmcli/config/node_modules/nopt/lib/type-defs.js
+  // node_modules/@npmcli/config/node_modules/nopt/lib/type-defs.js
   var require_type_defs = __commonJS({
-    "../../node_modules/@npmcli/config/node_modules/nopt/lib/type-defs.js"(exports, module) {
+    "node_modules/@npmcli/config/node_modules/nopt/lib/type-defs.js"(exports, module) {
       var url = __require("url");
       var path = __require("path");
       var Stream = __require("stream").Stream;
@@ -410,9 +410,9 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/@npmcli/config/node_modules/nopt/lib/nopt-lib.js
+  // node_modules/@npmcli/config/node_modules/nopt/lib/nopt-lib.js
   var require_nopt_lib = __commonJS({
-    "../../node_modules/@npmcli/config/node_modules/nopt/lib/nopt-lib.js"(exports, module) {
+    "node_modules/@npmcli/config/node_modules/nopt/lib/nopt-lib.js"(exports, module) {
       var abbrev = require_lib();
       var debug = require_debug();
       var defaultTypeDefs = require_type_defs();
@@ -816,9 +816,9 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/@npmcli/config/node_modules/nopt/lib/nopt.js
+  // node_modules/@npmcli/config/node_modules/nopt/lib/nopt.js
   var require_nopt = __commonJS({
-    "../../node_modules/@npmcli/config/node_modules/nopt/lib/nopt.js"(exports, module) {
+    "node_modules/@npmcli/config/node_modules/nopt/lib/nopt.js"(exports, module) {
       var lib = require_nopt_lib();
       var defaultTypeDefs = require_type_defs();
       module.exports = exports = nopt;
@@ -847,9 +847,9 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/proc-log/lib/index.js
+  // node_modules/proc-log/lib/index.js
   var require_lib2 = __commonJS({
-    "../../node_modules/proc-log/lib/index.js"(exports, module) {
+    "node_modules/proc-log/lib/index.js"(exports, module) {
       var META = /* @__PURE__ */ Symbol("proc-log.meta");
       module.exports = {
         META,
@@ -1010,9 +1010,9 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/@npmcli/config/lib/type-defs.js
+  // node_modules/@npmcli/config/lib/type-defs.js
   var require_type_defs2 = __commonJS({
-    "../../node_modules/@npmcli/config/lib/type-defs.js"(exports, module) {
+    "node_modules/@npmcli/config/lib/type-defs.js"(exports, module) {
       var nopt = require_nopt();
       var noptValidatePath = nopt.typeDefs.path.validate;
       var validatePath = (data, k, val) => {
@@ -1032,10 +1032,10 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/@npmcli/config/lib/nerf-dart.js
+  // node_modules/@npmcli/config/lib/nerf-dart.js
   var require_nerf_dart = __commonJS({
-    "../../node_modules/@npmcli/config/lib/nerf-dart.js"(exports, module) {
-      var { URL } = __require("url");
+    "node_modules/@npmcli/config/lib/nerf-dart.js"(exports, module) {
+      var { URL } = __require("node:url");
       module.exports = (url) => {
         const parsed = new URL(url);
         const from = `${parsed.protocol}//${parsed.host}${parsed.pathname}`;
@@ -1046,9 +1046,9 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/@npmcli/config/lib/env-replace.js
+  // node_modules/@npmcli/config/lib/env-replace.js
   var require_env_replace = __commonJS({
-    "../../node_modules/@npmcli/config/lib/env-replace.js"(exports, module) {
+    "node_modules/@npmcli/config/lib/env-replace.js"(exports, module) {
       var envExpr = /(?<!\\)(\\*)\$\{([^${}?]+)(\?)?\}/g;
       module.exports = (f, env) => f.replace(envExpr, (orig, esc, name, modifier) => {
         const fallback = modifier === "?" ? "" : `\${${name}}`;
@@ -1061,12 +1061,12 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/@npmcli/config/lib/parse-field.js
+  // node_modules/@npmcli/config/lib/parse-field.js
   var require_parse_field = __commonJS({
-    "../../node_modules/@npmcli/config/lib/parse-field.js"(exports, module) {
+    "node_modules/@npmcli/config/lib/parse-field.js"(exports, module) {
       var typeDefs = require_type_defs2();
       var envReplace = require_env_replace();
-      var { resolve } = __require("path");
+      var { resolve } = __require("node:path");
       var parseField = (f, key, opts, listElement = false) => {
         if (typeof f !== "string" && !Array.isArray(f)) {
           return f;
@@ -1118,9 +1118,9 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/@npmcli/config/lib/definitions/definitions.js
+  // node_modules/@npmcli/config/lib/definitions/definitions.js
   var require_definitions = __commonJS({
-    "../../node_modules/@npmcli/config/lib/definitions/definitions.js"(exports, module) {
+    "node_modules/@npmcli/config/lib/definitions/definitions.js"(exports, module) {
       var Definition = class {
         constructor(key, def) {
           this.key = key;
@@ -1172,9 +1172,9 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/@npmcli/config/lib/definitions/index.js
+  // node_modules/@npmcli/config/lib/definitions/index.js
   var require_definitions2 = __commonJS({
-    "../../node_modules/@npmcli/config/lib/definitions/index.js"(exports, module) {
+    "node_modules/@npmcli/config/lib/definitions/index.js"(exports, module) {
       var definitions = require_definitions();
       var flatten = (obj, flat = {}) => {
         for (const [key, val] of Object.entries(obj)) {
@@ -1194,9 +1194,9 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/@npmcli/config/lib/errors.js
+  // node_modules/@npmcli/config/lib/errors.js
   var require_errors = __commonJS({
-    "../../node_modules/@npmcli/config/lib/errors.js"(exports, module) {
+    "node_modules/@npmcli/config/lib/errors.js"(exports, module) {
       "use strict";
       var ErrInvalidAuth = class extends Error {
         constructor(problems) {
@@ -1220,18 +1220,18 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/@npmcli/config/lib/index.js
+  // node_modules/@npmcli/config/lib/index.js
   var require_lib3 = __commonJS({
-    "../../node_modules/@npmcli/config/lib/index.js"(exports, module) {
+    "node_modules/@npmcli/config/lib/index.js"(exports, module) {
       var ini = require_ini();
       var nopt = require_nopt();
       var { log } = require_lib2();
-      var { resolve, dirname, join } = __require("path");
-      var { homedir } = __require("os");
+      var { resolve, dirname, join } = __require("node:path");
+      var { homedir } = __require("node:os");
       var {
         readFile,
         stat
-      } = __require("fs/promises");
+      } = __require("node:fs/promises");
       var fileExists = (...p) => stat(resolve(...p)).then((st) => st.isFile()).catch(() => false);
       var hasOwnProperty = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
       var typeDefs = require_type_defs2();
@@ -1664,16 +1664,16 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/isexe/dist/commonjs/index.min.js
+  // node_modules/isexe/dist/commonjs/index.min.js
   var require_index_min = __commonJS({
-    "../../node_modules/isexe/dist/commonjs/index.min.js"(exports) {
+    "node_modules/isexe/dist/commonjs/index.min.js"(exports) {
       "use strict";
       var a = (t, e) => () => (e || t((e = { exports: {} }).exports, e), e.exports);
       var _ = a((i) => {
         "use strict";
         Object.defineProperty(i, "__esModule", { value: true });
         i.sync = i.isexe = void 0;
-        var M = __require("fs"), x = __require("fs/promises"), q = async (t, e = {}) => {
+        var M = __require("node:fs"), x = __require("node:fs/promises"), q = async (t, e = {}) => {
           let { ignoreErrors: r = false } = e;
           try {
             return d(await (0, x.stat)(t), e);
@@ -1706,7 +1706,7 @@ var plugin = (() => {
         "use strict";
         Object.defineProperty(o, "__esModule", { value: true });
         o.sync = o.isexe = void 0;
-        var T = __require("fs"), I = __require("fs/promises"), D = __require("path"), F = async (t, e = {}) => {
+        var T = __require("node:fs"), I = __require("node:fs/promises"), D = __require("node:path"), F = async (t, e = {}) => {
           let { ignoreErrors: r = false } = e;
           try {
             return y(await (0, I.stat)(t), t, e);
@@ -1788,9 +1788,9 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/which/lib/index.js
+  // node_modules/which/lib/index.js
   var require_lib4 = __commonJS({
-    "../../node_modules/which/lib/index.js"(exports, module) {
+    "node_modules/which/lib/index.js"(exports, module) {
       var { isexe, sync: isexeSync } = require_index_min();
       var { join, delimiter, sep, posix } = __require("path");
       var isWindows = process.platform === "win32";
@@ -1876,16 +1876,16 @@ var plugin = (() => {
     }
   });
 
-  // src/constants.ts
+  // plugins/npmrc/src/constants.ts
   var pluginName;
   var init_constants = __esm({
-    "src/constants.ts"() {
+    "plugins/npmrc/src/constants.ts"() {
       "use strict";
       pluginName = "yarn-plugin-npmrc";
     }
   });
 
-  // src/errors.ts
+  // plugins/npmrc/src/errors.ts
   var errors_exports = {};
   __export(errors_exports, {
     throwError: () => throwError
@@ -1898,14 +1898,14 @@ var plugin = (() => {
   }
   var import_core;
   var init_errors = __esm({
-    "src/errors.ts"() {
+    "plugins/npmrc/src/errors.ts"() {
       "use strict";
       import_core = __require("@yarnpkg/core");
       init_constants();
     }
   });
 
-  // src/loadNpmrc.ts
+  // plugins/npmrc/src/loadNpmrc.ts
   var loadNpmrc_exports = {};
   __export(loadNpmrc_exports, {
     loadNpmrc: () => loadNpmrc
@@ -1944,7 +1944,7 @@ var plugin = (() => {
   }
   var import_config, import_fs, import_which;
   var init_loadNpmrc = __esm({
-    "src/loadNpmrc.ts"() {
+    "plugins/npmrc/src/loadNpmrc.ts"() {
       "use strict";
       import_config = __toESM(require_lib3());
       import_fs = __toESM(__require("fs"));
@@ -1954,7 +1954,7 @@ var plugin = (() => {
     }
   });
 
-  // src/index.ts
+  // plugins/npmrc/src/index.ts
   var index_exports = {};
   __export(index_exports, {
     default: () => index_default

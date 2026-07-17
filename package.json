@@ -5,7 +5,6 @@
   "license": "MIT",
   "scripts": {
     "build": "yarn tsc -b && node scripts/build.ts --all",
-    "clean": "node scripts/clean.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run"
@@ -16,7 +15,8 @@
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/semver": "^7.0.0",
-    "@yarnpkg/builder": "^4.2.3",
+    "@yarnpkg/cli": "^4.14.1",
+    "esbuild-wasm": "^0.28.1",
     "nano-spawn": "^2.1.0",
     "prettier": "^3.8.3",
     "semver": "^7.7.4",
@@ -26,13 +26,11 @@
     "workspace-tools": "^0.42.0"
   },
   "resolutions": {
-    "esbuild@npm:esbuild-wasm@^0.23.0": "npm:esbuild-wasm@^0.28.1",
     "glob@npm:^10.2.2": "^13.0.0",
     "minimatch@npm:^9.0.5": "^10.2.2"
   },
   "rationale": {
     "resolutions": {
-      "esbuild@npm:esbuild-wasm@^0.23.0": "force update @yarnpkg/builder esbuild",
       "glob@npm:^10.2.2": "Fix security issue (used API is compatible)",
       "minimatch@npm:^9.0.5": "Remove insecure dep (not actually used)"
     }

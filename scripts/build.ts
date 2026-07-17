@@ -12,13 +12,11 @@ async function run() {
 
   for (const plugin of plugins) {
     fs.rmSync(plugin.paths.dist, { recursive: true, force: true });
-    fs.mkdirSync(plugin.paths.dist, { recursive: true });
-
     await runBuild(plugin);
   }
 }
 
 run().catch((error) => {
-  console.error((error as Error).message || error);
+  console.error((error as Error).stack || error);
   process.exit(1);
 });

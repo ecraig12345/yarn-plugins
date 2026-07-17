@@ -950,25 +950,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@yarnpkg/builder@npm:^4.2.3":
-  version: 4.2.3
-  resolution: "@yarnpkg/builder@npm:4.2.3"
-  dependencies:
-    "@yarnpkg/cli": "npm:^4.10.0"
-    "@yarnpkg/core": "npm:^4.4.4"
-    "@yarnpkg/fslib": "npm:^3.1.3"
-    chalk: "npm:^4.1.2"
-    clipanion: "npm:^4.0.0-rc.2"
-    esbuild: "npm:esbuild-wasm@^0.23.0"
-    semver: "npm:^7.1.2"
-    tslib: "npm:^2.4.0"
-  bin:
-    builder: ./lib/cli.js
-  checksum: 10c0/916578cee6a41dd69b7ab3a2b45595780e76bdca3c173b1c1139c14e9ea495a76638d7516c25bc4524ca8df303baaa180f294db9023110a1fb9a124d44a5ea92
-  languageName: node
-  linkType: hard
-
-"@yarnpkg/cli@npm:^4.10.0, @yarnpkg/cli@npm:^4.14.1":
+"@yarnpkg/cli@npm:^4.14.1":
   version: 4.17.1
   resolution: "@yarnpkg/cli@npm:4.17.1"
   dependencies:
@@ -1013,7 +995,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@yarnpkg/core@npm:^4.4.4, @yarnpkg/core@npm:^4.7.0, @yarnpkg/core@npm:^4.9.0":
+"@yarnpkg/core@npm:^4.7.0, @yarnpkg/core@npm:^4.9.0":
   version: 4.9.0
   resolution: "@yarnpkg/core@npm:4.9.0"
   dependencies:
@@ -2037,7 +2019,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:esbuild-wasm@^0.28.1":
+"esbuild-wasm@npm:^0.28.1":
   version: 0.28.1
   resolution: "esbuild-wasm@npm:0.28.1"
   bin:
@@ -4323,6 +4305,7 @@ __metadata:
   resolution: "yarn-plugin-engines@workspace:plugins/engines"
   dependencies:
     "@yarnpkg/core": "npm:^4.7.0"
+    "@yarnpkg/fslib": "npm:^3.1.5"
     semver: "npm:^7.7.4"
   languageName: unknown
   linkType: soft
@@ -4347,7 +4330,8 @@ __metadata:
   dependencies:
     "@types/node": "npm:^22.0.0"
     "@types/semver": "npm:^7.0.0"
-    "@yarnpkg/builder": "npm:^4.2.3"
+    "@yarnpkg/cli": "npm:^4.14.1"
+    esbuild-wasm: "npm:^0.28.1"
     nano-spawn: "npm:^2.1.0"
     prettier: "npm:^3.8.3"
     semver: "npm:^7.7.4"

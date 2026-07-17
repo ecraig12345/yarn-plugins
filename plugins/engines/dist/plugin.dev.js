@@ -39,7 +39,7 @@ var plugin = (() => {
   ));
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // src/index.ts
+  // plugins/engines/src/index.ts
   var index_exports = {};
   __export(index_exports, {
     default: () => index_default
@@ -49,7 +49,7 @@ var plugin = (() => {
   var import_path = __toESM(__require("path"));
   var import_semver2 = __toESM(__require("semver"));
 
-  // src/ranges.ts
+  // plugins/engines/src/ranges.ts
   var import_semver = __toESM(__require("semver"));
   function parseRange(range) {
     try {
@@ -68,7 +68,7 @@ var plugin = (() => {
     return loose ? import_semver.default.satisfies(import_semver.default.minVersion(repoRange), manifestSemver) : import_semver.default.subset(repoRange, manifestSemver);
   }
 
-  // src/index.ts
+  // plugins/engines/src/index.ts
   var configurationMap = {
     engines: {
       description: "Config for yarn-plugin-engines",

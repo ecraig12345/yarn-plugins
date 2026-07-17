@@ -28,7 +28,6 @@ export function getPluginData(cwd: string) {
 
   const shortName = packageInfo.name.replace(pluginPrefix, '');
   const distPath = path.join(packageRoot, 'dist');
-  const bundlesPath = path.join(packageRoot, 'bundles');
 
   return {
     name: packageInfo.name,
@@ -38,16 +37,11 @@ export function getPluginData(cwd: string) {
     /** All paths are absolute */
     paths: {
       packageRoot,
+      projectRoot,
       packageJson: packageInfo.packageJsonPath,
       readme: path.join(packageRoot, 'README.md'),
-      /** Automatic top "bundles" output folder from `@yarnpkg/builder` */
-      bundles: bundlesPath,
-      /** Automatic output path from `@yarnpkg/builder` */
-      bundleFile: path.join(
-        bundlesPath,
-        '@yarnpkg',
-        packageInfo.name.replace(/^yarn-/, '') + '.js',
-      ),
+      /** Bundle entry point (from package.json `main`) */
+      entry: path.resolve(packageRoot, packageInfo.main ?? 'src/index.ts'),
       dist: distPath,
       /** Final dist path for the minified bundle */
       minBundle: path.join(distPath, 'plugin.js'),
