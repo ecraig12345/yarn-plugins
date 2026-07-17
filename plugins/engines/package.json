@@ -5,8 +5,8 @@
   "license": "MIT",
   "main": "./src/index.ts",
   "scripts": {
-    "build": "yarn run -T tsc -b && node ../../scripts/build.js",
-    "release": "node ../../scripts/release.js",
+    "build": "yarn run -T tsc -b && node ../../scripts/build.ts",
+    "release": "node ../../scripts/release.ts",
     "test": "yarn run -T vitest run"
   },
   "dependencies": {

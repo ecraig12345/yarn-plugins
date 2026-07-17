@@ -1,5 +1,5 @@
-const fs = require('fs');
-const { getAllPluginData } = require('./getPluginData');
+import fs from 'node:fs';
+import { getAllPluginData } from './getPluginData.ts';
 
 const plugins = getAllPluginData();
 for (const plugin of plugins) {

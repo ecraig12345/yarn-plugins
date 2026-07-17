@@ -1,6 +1,6 @@
-const fs = require('fs');
-const { getPluginData, getAllPluginData } = require('./getPluginData');
-const { runBuild } = require('./runBuild');
+import fs from 'node:fs';
+import { getPluginData, getAllPluginData } from './getPluginData.ts';
+import { runBuild } from './runBuild.ts';
 
 /**
  * Build the plugin package in the cwd, or all plugin packages with `--all`.
@@ -19,6 +19,6 @@ async function run() {
 }
 
 run().catch((error) => {
-  console.error(/** @type {Error} */ (error).message || error);
+  console.error((error as Error).message || error);
   process.exit(1);
 });

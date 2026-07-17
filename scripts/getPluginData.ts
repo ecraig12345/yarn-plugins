@@ -1,19 +1,19 @@
-const path = require('path');
-const {
+import path from 'node:path';
+import {
   findPackageRoot,
   findProjectRoot,
   getPackageInfo,
   getWorkspacePackagePaths,
-} = require('workspace-tools');
+} from 'workspace-tools';
 
 const pluginPrefix = /^yarn-plugin-/;
 
 /**
  * Get absolute paths to various files and folders relative to a plugin folder,
  * as well as its package.json contents.
- * @param {string} cwd - Get the plugin info in this directory
+ * @param cwd - Get the plugin info in this directory
  */
-function getPluginData(cwd) {
+export function getPluginData(cwd: string) {
   const packageRoot = findPackageRoot(cwd);
   const projectRoot = findProjectRoot(cwd);
   const packageInfo = packageRoot && getPackageInfo(packageRoot);
@@ -57,7 +57,7 @@ function getPluginData(cwd) {
   };
 }
 
-function getAllPluginData() {
+export function getAllPluginData() {
   const paths = getWorkspacePackagePaths(process.cwd());
   if (paths?.length) {
     return paths.map((pth) => getPluginData(pth));
@@ -65,5 +65,4 @@ function getAllPluginData() {
   throw new Error('No packages found under ' + process.cwd());
 }
 
-/** @typedef {ReturnType<typeof getPluginData>} PluginData */
-module.exports = { getPluginData, getAllPluginData };
+export type PluginData = ReturnType<typeof getPluginData>;

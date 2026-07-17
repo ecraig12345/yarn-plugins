@@ -17,11 +17,20 @@ var plugin = (() => {
     if (typeof require !== "undefined") return require.apply(this, arguments);
     throw Error('Dynamic require of "' + x + '" is not supported');
   });
-  var __esm = (fn, res) => function __init() {
-    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+  var __esm = (fn, res, err) => function __init() {
+    if (err) throw err[0];
+    try {
+      return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+    } catch (e) {
+      throw err = [e], e;
+    }
   };
   var __commonJS = (cb, mod) => function __require2() {
-    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+    try {
+      return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+    } catch (e) {
+      throw mod = 0, e;
+    }
   };
   var __export = (target, all) => {
     for (var name in all)
@@ -257,9 +266,9 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/abbrev/lib/index.js
+  // ../../node_modules/@npmcli/config/node_modules/abbrev/lib/index.js
   var require_lib = __commonJS({
-    "../../node_modules/abbrev/lib/index.js"(exports, module) {
+    "../../node_modules/@npmcli/config/node_modules/abbrev/lib/index.js"(exports, module) {
       module.exports = abbrev;
       function abbrev(...args) {
         let list = args;
@@ -309,17 +318,17 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/nopt/lib/debug.js
+  // ../../node_modules/@npmcli/config/node_modules/nopt/lib/debug.js
   var require_debug = __commonJS({
-    "../../node_modules/nopt/lib/debug.js"(exports, module) {
+    "../../node_modules/@npmcli/config/node_modules/nopt/lib/debug.js"(exports, module) {
       module.exports = process.env.DEBUG_NOPT || process.env.NOPT_DEBUG ? (...a) => console.error(...a) : () => {
       };
     }
   });
 
-  // ../../node_modules/nopt/lib/type-defs.js
+  // ../../node_modules/@npmcli/config/node_modules/nopt/lib/type-defs.js
   var require_type_defs = __commonJS({
-    "../../node_modules/nopt/lib/type-defs.js"(exports, module) {
+    "../../node_modules/@npmcli/config/node_modules/nopt/lib/type-defs.js"(exports, module) {
       var url = __require("url");
       var path = __require("path");
       var Stream = __require("stream").Stream;
@@ -401,9 +410,9 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/nopt/lib/nopt-lib.js
+  // ../../node_modules/@npmcli/config/node_modules/nopt/lib/nopt-lib.js
   var require_nopt_lib = __commonJS({
-    "../../node_modules/nopt/lib/nopt-lib.js"(exports, module) {
+    "../../node_modules/@npmcli/config/node_modules/nopt/lib/nopt-lib.js"(exports, module) {
       var abbrev = require_lib();
       var debug = require_debug();
       var defaultTypeDefs = require_type_defs();
@@ -748,7 +757,7 @@ var plugin = (() => {
           remain.push(arg);
         }
       }
-      var SINGLES = Symbol("singles");
+      var SINGLES = /* @__PURE__ */ Symbol("singles");
       var singleCharacters = (arg, shorthands) => {
         let singles = shorthands[SINGLES];
         if (!singles) {
@@ -807,9 +816,9 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/nopt/lib/nopt.js
+  // ../../node_modules/@npmcli/config/node_modules/nopt/lib/nopt.js
   var require_nopt = __commonJS({
-    "../../node_modules/nopt/lib/nopt.js"(exports, module) {
+    "../../node_modules/@npmcli/config/node_modules/nopt/lib/nopt.js"(exports, module) {
       var lib = require_nopt_lib();
       var defaultTypeDefs = require_type_defs();
       module.exports = exports = nopt;
@@ -841,7 +850,7 @@ var plugin = (() => {
   // ../../node_modules/proc-log/lib/index.js
   var require_lib2 = __commonJS({
     "../../node_modules/proc-log/lib/index.js"(exports, module) {
-      var META = Symbol("proc-log.meta");
+      var META = /* @__PURE__ */ Symbol("proc-log.meta");
       module.exports = {
         META,
         output: {
@@ -1606,8 +1615,8 @@ var plugin = (() => {
           return creds;
         }
       };
-      var _loadError = Symbol("loadError");
-      var _valid = Symbol("valid");
+      var _loadError = /* @__PURE__ */ Symbol("loadError");
+      var _valid = /* @__PURE__ */ Symbol("valid");
       var ConfigData = class {
         #data;
         /** @type {string|null} */
@@ -1655,9 +1664,9 @@ var plugin = (() => {
     }
   });
 
-  // ../../node_modules/which/node_modules/isexe/dist/commonjs/index.min.js
+  // ../../node_modules/isexe/dist/commonjs/index.min.js
   var require_index_min = __commonJS({
-    "../../node_modules/which/node_modules/isexe/dist/commonjs/index.min.js"(exports) {
+    "../../node_modules/isexe/dist/commonjs/index.min.js"(exports) {
       "use strict";
       var a = (t, e) => () => (e || t((e = { exports: {} }).exports, e), e.exports);
       var _ = a((i) => {
@@ -1733,21 +1742,21 @@ var plugin = (() => {
         "use strict";
         Object.defineProperty(h, "__esModule", { value: true });
       });
-      var v = exports && exports.__createBinding || (Object.create ? function(t, e, r, s) {
+      var v = exports && exports.__createBinding || (Object.create ? (function(t, e, r, s) {
         s === void 0 && (s = r);
         var n = Object.getOwnPropertyDescriptor(e, r);
         (!n || ("get" in n ? !e.__esModule : n.writable || n.configurable)) && (n = { enumerable: true, get: function() {
           return e[r];
         } }), Object.defineProperty(t, s, n);
-      } : function(t, e, r, s) {
+      }) : (function(t, e, r, s) {
         s === void 0 && (s = r), t[s] = e[r];
-      });
-      var G = exports && exports.__setModuleDefault || (Object.create ? function(t, e) {
+      }));
+      var G = exports && exports.__setModuleDefault || (Object.create ? (function(t, e) {
         Object.defineProperty(t, "default", { enumerable: true, value: e });
-      } : function(t, e) {
+      }) : function(t, e) {
         t.default = e;
       });
-      var w = exports && exports.__importStar || /* @__PURE__ */ function() {
+      var w = exports && exports.__importStar || /* @__PURE__ */ (function() {
         var t = function(e) {
           return t = Object.getOwnPropertyNames || function(r) {
             var s = [];
@@ -1761,7 +1770,7 @@ var plugin = (() => {
           if (e != null) for (var s = t(e), n = 0; n < s.length; n++) s[n] !== "default" && v(r, e, s[n]);
           return G(r, e), r;
         };
-      }();
+      })();
       var X = exports && exports.__exportStar || function(t, e) {
         for (var r in t) r !== "default" && !Object.prototype.hasOwnProperty.call(e, r) && v(e, t, r);
       };
@@ -1946,9 +1955,9 @@ var plugin = (() => {
   });
 
   // src/index.ts
-  var src_exports = {};
-  __export(src_exports, {
-    default: () => src_default
+  var index_exports = {};
+  __export(index_exports, {
+    default: () => index_default
   });
   var import_core2 = __require("@yarnpkg/core");
   var configurationMap = {
@@ -2013,8 +2022,8 @@ var plugin = (() => {
     hooks: { validateProject, getNpmAuthenticationHeader },
     configuration: configurationMap
   };
-  var src_default = plugin;
-  return __toCommonJS(src_exports);
+  var index_default = plugin;
+  return __toCommonJS(index_exports);
 })();
 return plugin;
 }

@@ -4,8 +4,8 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "build": "yarn tsc -b && node scripts/build.js --all",
-    "clean": "node scripts/clean.js",
+    "build": "yarn tsc -b && node scripts/build.ts --all",
+    "clean": "node scripts/clean.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run"
@@ -21,20 +21,20 @@
     "prettier": "^3.8.3",
     "semver": "^7.7.4",
     "syncpack": "^15.0.0",
-    "typescript": "^6.0.0",
+    "typescript": "~7.0.0",
     "vitest": "^4.1.5",
-    "workspace-tools": "^0.41.7"
+    "workspace-tools": "^0.42.0"
   },
   "resolutions": {
+    "esbuild@npm:esbuild-wasm@^0.23.0": "npm:esbuild-wasm@^0.28.1",
     "glob@npm:^10.2.2": "^13.0.0",
-    "minimatch@npm:^9.0.5": "^10.2.2",
-    "tar@npm:^6.0.5": "^7.5.9"
+    "minimatch@npm:^9.0.5": "^10.2.2"
   },
   "rationale": {
     "resolutions": {
+      "esbuild@npm:esbuild-wasm@^0.23.0": "force update @yarnpkg/builder esbuild",
       "glob@npm:^10.2.2": "Fix security issue (used API is compatible)",
-      "minimatch@npm:^9.0.5": "Remove insecure dep (not actually used)",
-      "tar@npm:^6.0.5": "Fix security issue (API is compatible)"
+      "minimatch@npm:^9.0.5": "Remove insecure dep (not actually used)"
     }
   },
   "engines": {

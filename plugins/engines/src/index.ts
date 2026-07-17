@@ -75,8 +75,7 @@ const validateProjectAfterInstall: NonNullable<Hooks['validateProjectAfterInstal
   report,
 ) => {
   const enginesConfig = project.configuration.get('engines') as
-    | EnginesConfig['engines']
-    | undefined;
+    EnginesConfig['engines'] | undefined;
   const ignorePackages = enginesConfig?.get('ignorePackages') || [];
   const includeDevDependencies = !!enginesConfig?.get('includeDevDependencies');
   const loose = !!enginesConfig?.get('loose');

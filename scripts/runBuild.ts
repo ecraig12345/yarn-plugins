@@ -1,5 +1,6 @@
-/** @import { PluginData } from './getPluginData' */
-const fs = require('fs');
+import fs from 'node:fs';
+import nanoSpawn from 'nano-spawn';
+import type { PluginData } from './getPluginData.ts';
 
 // These can be updated if needed, but the goal is to keep them low to reduce parse time penalty
 // on EVERY yarn command (even when the plugin isn't used)
@@ -7,17 +8,13 @@ const maxKbDev = 75;
 const maxKbMin = 30;
 
 // Follow the EOL which appears to be used by git in the output files, since they're checked in
-const gitEol = fs.readFileSync(__filename, 'utf8').match(/\r?\n/)?.[0] || '\n';
+const gitEol = fs.readFileSync(import.meta.filename, 'utf8').match(/\r?\n/)?.[0] || '\n';
 
-/**
- * @param {PluginData} plugin
- */
-async function runBuild(plugin) {
-  const nanoSpawn = (await import('nano-spawn')).default;
+export async function runBuild(plugin: PluginData) {
   await runSingleBuild(false);
   await runSingleBuild(true);
 
-  async function runSingleBuild(/** @type {boolean} */ minify) {
+  async function runSingleBuild(minify: boolean) {
     // The yarn builder has no way to specify output paths, so manually rename the files...
     await nanoSpawn('builder', ['build', 'plugin', ...(minify ? [] : ['--no-minify'])], {
       cwd: plugin.paths.packageRoot,
@@ -35,7 +32,7 @@ async function runBuild(plugin) {
         `❌ ${bundlePath} bundle size has increased: ${kb} KB (previous limit: ${maxKb} KB)`,
       );
       console.log(
-        'You can increase the size in scripts/build.js if needed, but first check the diff ' +
+        'You can increase the size in scripts/build.ts if needed, but first check the diff ' +
           'to see what changed and if anything can be removed.',
       );
       process.exit(1);
@@ -47,5 +44,3 @@ async function runBuild(plugin) {
     console.log(`✅ Updated ${bundlePath}\n`);
   }
 }
-
-module.exports.runBuild = runBuild;

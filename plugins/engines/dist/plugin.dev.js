@@ -40,9 +40,9 @@ var plugin = (() => {
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
   // src/index.ts
-  var src_exports = {};
-  __export(src_exports, {
-    default: () => src_default
+  var index_exports = {};
+  __export(index_exports, {
+    default: () => index_default
   });
   var import_core = __require("@yarnpkg/core");
   var import_fslib = __require("@yarnpkg/fslib");
@@ -245,8 +245,8 @@ var plugin = (() => {
     hooks: { validateProjectAfterInstall },
     configuration: configurationMap
   };
-  var src_default = plugin;
-  return __toCommonJS(src_exports);
+  var index_default = plugin;
+  return __toCommonJS(index_exports);
 })();
 return plugin;
 }
