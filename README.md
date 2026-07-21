@@ -1,3 +1,5 @@
+# Moved to https://github.com/microsoft/beachball/tree/main/yarn-plugins
+
 A collection of yarn plugins.
 
 ## Plugins
